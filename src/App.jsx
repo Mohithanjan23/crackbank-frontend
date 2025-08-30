@@ -116,7 +116,7 @@ const handleCheck = async (e) => {
     }
     logLines.push("[COMPLETE] Scan finished.");
 
-    // --- FIXED: Prevents "undefined" output ---
+    // --- FIXED: Prevents "undefined" at the end ---
     setResult(""); // reset terminal
     let i = 0;
     const interval = setInterval(() => {
@@ -124,7 +124,7 @@ const handleCheck = async (e) => {
         setResult((prev) => prev + (prev ? "\n" : "") + logLines[i]);
         i++;
       } else {
-        clearInterval(interval);
+        clearInterval(interval); // stop before appending "undefined"
       }
     }, 900);
   } catch (err) {
