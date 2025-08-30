@@ -19,7 +19,7 @@ export default function App() {
 
   const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
 
-  // Matrix Rain Background
+  // --- Matrix Rain Background ---
   useEffect(() => {
     const canvas = document.getElementById("matrix-canvas");
     if (!canvas) return;
@@ -39,44 +39,48 @@ export default function App() {
     const rainDrops = Array(columns).fill(1);
 
     const render = () => {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Green text with 30% opacity
-  ctx.fillStyle = "rgba(0, 255, 0, 0.13)";
-  ctx.font = fontSize + "px monospace";
+      // Green text with 30% opacity
+      ctx.fillStyle = "rgba(0, 255, 0, 0.3)";
+      ctx.font = fontSize + "px monospace";
 
-  for (let i = 0; i < rainDrops.length; i++) {
-    const text = letters.charAt(Math.floor(Math.random() * letters.length));
-    ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+      for (let i = 0; i < rainDrops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
 
-    if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-      rainDrops[i] = 0;
-    }
-    rainDrops[i]++;
-  }
-  animationFrameId = requestAnimationFrame(render);
-};
+        if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          rainDrops[i] = 0;
+        }
+        rainDrops[i]++;
+      }
+      animationFrameId = requestAnimationFrame(render);
+    };
     render();
+
     return () => {
       window.removeEventListener("resize", resizeCanvas);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
-  // Typing effect for subtitle
+  // --- Typing effect for subtitle ---
   useEffect(() => {
     const text = "Cybernetic Breach Analysis Protocol";
     let i = 0;
     const interval = setInterval(() => {
-      setSubtitle((prev) => prev + text[i]);
-      i++;
-      if (i >= text.length) clearInterval(interval);
+      if (i < text.length) {
+        setSubtitle((prev) => prev + text[i]);
+        i++;
+      } else {
+        clearInterval(interval);
+      }
     }, 70);
     return () => clearInterval(interval);
   }, []);
 
-  // Handle Breach Check
+  // --- Handle Breach Check ---
   const handleCheck = async (e) => {
     e.preventDefault();
     if (!inputValue) return;
@@ -92,8 +96,7 @@ export default function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-    });
-
+      });
 
       const data = await response.json();
 
