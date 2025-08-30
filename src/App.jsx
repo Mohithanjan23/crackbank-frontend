@@ -81,56 +81,58 @@ export default function App() {
   return () => clearInterval(interval);
 }, []);
 
-  // --- Handle Breach Check ---
-  const handleCheck = async (e) => {
-    e.preventDefault();
-    if (!inputValue) return;
+// --- Handle Breach Check ---
+const handleCheck = async (e) => {
+  e.preventDefault();
+  if (!inputValue) return;
 
-    setIsLoading(true);
-    setResult("[scanning target ID...]");
+  setIsLoading(true);
+  setResult("[scanning target ID...]");
 
-    try {
-      const hash = await sha1(inputValue.trim());
-      const body = { hash, last4: inputValue.slice(-4), email };
+  try {
+    const hash = await sha1(inputValue.trim());
+    const body = { hash, last4: inputValue.slice(-4), email };
 
-      const response = await fetch(`${API_BASE}/check-breach-hash`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+    const response = await fetch(`${API_BASE}/check-breach-hash`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      let logLines = [
-        "[INIT] Connecting to breach database...",
-        `[SCAN] Target hash → ${hash.slice(0, 12)}...`,
-      ];
+    let logLines = [
+      "[INIT] Connecting to breach database...",
+      `[SCAN] Target hash → ${hash.slice(0, 12)}...`,
+    ];
 
-      if (data.breached) {
-        logLines.push(`[FOUND] ${data.breaches.length} Breach(es) Detected`);
-        data.breaches.forEach((b) =>
-          logLines.push(
-            `> ${b.source} (${b.date}) [Risk: ${b.risk_level}]`
-          )
-        );
-      } else {
-        logLines.push("[SECURE] No breaches found.");
-      }
-      logLines.push("[COMPLETE] Scan finished.");
-
-      setResult(""); // reset terminal
-      let i = 0;
-      const interval = setInterval(() => {
-        setResult((prev) => prev + "\n" + logLines[i]);
-        i++;
-        if (i === logLines.length) clearInterval(interval);
-      }, 900);
-    } catch (err) {
-      setResult(`[SYSTEM_ERROR] ${err.message}`);
-    } finally {
-      setIsLoading(false);
+    if (data.breached) {
+      logLines.push(`[FOUND] ${data.breaches.length} Breach(es) Detected`);
+      data.breaches.forEach((b) =>
+        logLines.push(`> ${b.source} (${b.date}) [Risk: ${b.risk_level}]`)
+      );
+    } else {
+      logLines.push("[SECURE] No breaches found.");
     }
-  };
+    logLines.push("[COMPLETE] Scan finished.");
+
+    // --- FIXED: Prevents "undefined" output ---
+    setResult(""); // reset terminal
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < logLines.length) {
+        setResult((prev) => prev + (prev ? "\n" : "") + logLines[i]);
+        i++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 900);
+  } catch (err) {
+    setResult(`[SYSTEM_ERROR] ${err.message}`);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <>
