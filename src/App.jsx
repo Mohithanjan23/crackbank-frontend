@@ -67,17 +67,14 @@ export default function App() {
 
   // --- Typing effect for subtitle ---
   useEffect(() => {
-  const text = "Cybernetic Breach Analysis Protocol";
-  setSubtitle("");   // reset first
-  let i = 0;
   const interval = setInterval(() => {
-    if (i < text.length) {
-      setSubtitle((prev) => prev + text[i]);
-      i++;
-    } else {
-      clearInterval(interval);
-    }
-  }, 70);
+  if (i < logLines.length) {
+    setResult((prev) => prev + (prev ? "\n" : "") + logLines[i]);
+    i++;
+  } else {
+    clearInterval(interval); // stop when done
+  }
+}, 900);
   return () => clearInterval(interval);
 }, []);
 
