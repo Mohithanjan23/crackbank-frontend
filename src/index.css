@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    background-color: #000;
+}
+
+.hacker-font {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.typing-cursor::after {
+    content: '▋';
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+::selection {
+    background: #00ff41;
+    color: #000;
+}
+
+::-moz-selection {
+    background: #00ff41;
+    color: #000;
+}
+
